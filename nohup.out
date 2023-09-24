@@ -1,0 +1,36 @@
+2023-09-12 23:15:18,637 - INFO - Database connected successfully!
+2023-09-12 23:15:18,637 - INFO - Subscription ID: 1, User ID: string
+2023-09-12 23:15:18,637 - INFO - Subscription ID: 2, User ID: hello
+2023-09-12 23:15:18,637 - INFO - Subscription ID: 3, User ID: 2edsd
+2023-09-12 23:15:18,637 - INFO - Subscription ID: 4, User ID: 2edㅜ ㅏ ㅏㅜㅏㅓsd
+2023-09-12 23:15:18,639 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2023-09-12 23:15:18,639 - INFO - Added job "start_scheduler.<locals>.<lambda>" to job store "default"
+2023-09-12 23:15:18,639 - INFO - Scheduler started
+2023-09-12 23:15:18,639 - INFO - Scheduler started successfully.
+2023-09-12 23:23:50,980 - INFO - Database connected successfully!
+2023-09-12 23:23:50,980 - INFO - Subscription ID: 1, User ID: string
+2023-09-12 23:23:50,980 - INFO - Subscription ID: 2, User ID: hello
+2023-09-12 23:23:50,980 - INFO - Subscription ID: 3, User ID: 2edsd
+2023-09-12 23:23:50,980 - INFO - Subscription ID: 4, User ID: 2edㅜ ㅏ ㅏㅜㅏㅓsd
+2023-09-12 23:23:50,981 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2023-09-12 23:23:50,981 - INFO - Added job "start_scheduler.<locals>.<lambda>" to job store "default"
+2023-09-12 23:23:50,981 - INFO - Scheduler started
+2023-09-12 23:23:50,982 - INFO - Scheduler started successfully.
+2023-09-12 23:27:03,541 - INFO - Database connected successfully!
+2023-09-12 23:27:03,541 - INFO - Subscription ID: 1, User ID: string
+2023-09-12 23:27:03,541 - INFO - Subscription ID: 2, User ID: hello
+2023-09-12 23:27:03,541 - INFO - Subscription ID: 3, User ID: 2edsd
+2023-09-12 23:27:03,541 - INFO - Subscription ID: 4, User ID: 2edㅜ ㅏ ㅏㅜㅏㅓsd
+2023-09-12 23:27:03,543 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2023-09-12 23:27:03,543 - INFO - Added job "start_scheduler.<locals>.<lambda>" to job store "default"
+2023-09-12 23:27:03,543 - INFO - Scheduler started
+2023-09-12 23:27:03,543 - INFO - Scheduler started successfully.
+2023-09-12 23:28:10,511 - INFO - Database connected successfully!
+2023-09-12 23:28:10,511 - INFO - Subscription ID: 1, User ID: string
+2023-09-12 23:28:10,512 - INFO - Subscription ID: 2, User ID: hello
+2023-09-12 23:28:10,512 - INFO - Subscription ID: 3, User ID: 2edsd
+2023-09-12 23:28:10,512 - INFO - Subscription ID: 4, User ID: 2edㅜ ㅏ ㅏㅜㅏㅓsd
+2023-09-12 23:28:10,513 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2023-09-12 23:28:10,513 - INFO - Added job "start_scheduler.<locals>.<lambda>" to job store "default"
+2023-09-12 23:28:10,513 - INFO - Scheduler started
+2023-09-12 23:28:10,513 - INFO - Scheduler started successfully.
