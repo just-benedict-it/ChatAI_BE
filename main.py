@@ -179,7 +179,7 @@ def get_free_message(user_id: str, db: Session = Depends(get_db)):
 
 # 채팅 전송
 @app.post("/chat/send")
-async def send_chat(chat: schemas.ChatHistoryCreate, db: Session = Depends(get_db)):
+async def send_chat(chat: schemas.ChatHistoryCreate, model_type:int, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == chat.user_id).first()
     
     # 사용자가 존재하지 않는 경우 처리
@@ -197,7 +197,7 @@ async def send_chat(chat: schemas.ChatHistoryCreate, db: Session = Depends(get_d
     # chat history 불러오기
     chat_history = get_chat_history(chat.chat_id, db)
     # GPT로부터 응답 받기
-    ai_response = get_chatgpt_response(message, chat_history)
+    ai_response = get_chatgpt_response(message, chat_history,model_type)
     # 사용자 채팅 저장
     save_chat(db, chat.user_id, chat.chat_id, type=1, message=message)
     # GPT 채팅 저장
