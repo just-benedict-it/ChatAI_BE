@@ -8,7 +8,7 @@ load_dotenv()
 openai.api_key = os.getenv("CHATGPT_API")
 
 def get_chatgpt_response(message, model_type, chat_history=[]):
-    model = "gpt-4.0" if model_type == 1 else "gpt-3.5-turbo" if model_type == 2 else None
+    model = "gpt-4" if model_type == 1 else "gpt-3.5-turbo" if model_type == 2 else None
 
     # chat_history를 messages 배열에 추가
     messages = [{"role": "assistant" if chat.type == 0 else "user", "content": chat.message} for chat in chat_history]
