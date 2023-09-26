@@ -197,7 +197,7 @@ async def send_chat(chat: schemas.ChatHistoryCreate, model_type:int, db: Session
     # chat history 불러오기
     chat_history = get_chat_history(chat.chat_id, db)
     # GPT로부터 응답 받기
-    ai_response = get_chatgpt_response(message, chat_history,model_type)
+    ai_response = get_chatgpt_response(message,model_type,chat_history)
     # 사용자 채팅 저장
     save_chat(db, chat.user_id, chat.chat_id, type=1, message=message)
     # GPT 채팅 저장
