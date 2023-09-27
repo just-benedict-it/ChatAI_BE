@@ -46,6 +46,8 @@ class UserActivity(BaseModel):
     class Config:
         orm_mode = True
 
+
+
 # class UserActivityCreate(BaseModel):
 #     activity_type: int
 #     user_id: str

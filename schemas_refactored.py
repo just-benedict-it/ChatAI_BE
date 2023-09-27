@@ -75,3 +75,5 @@ class UserActivityRead(UserActivityBase):
     id: int
     created_at: datetime
 
+class Subscribed(BaseModel):
+    subscribed : bool
