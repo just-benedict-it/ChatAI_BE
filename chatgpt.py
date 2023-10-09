@@ -2,6 +2,8 @@ import requests
 from dotenv import load_dotenv
 import os
 import openai
+from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
 
 
 load_dotenv()
@@ -20,3 +22,4 @@ def get_chatgpt_response(message, model_type, chat_history=[]):
                 temperature=0,
             )
     return response.choices[0].message.content
+

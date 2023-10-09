@@ -1,5 +1,6 @@
 
 from fastapi import FastAPI, HTTPException, Depends
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine, func,or_, asc, desc,case
@@ -10,7 +11,11 @@ import models
 from database import engine, SessionLocal
 from fastapi.responses import HTMLResponse
 from chatgpt import get_chatgpt_response
-
+from dotenv import load_dotenv
+import os
+import openai
+load_dotenv()
+openai.api_key = os.getenv("CHATGPT_API")
 
 app = FastAPI(debug=True)
 
@@ -213,6 +218,40 @@ async def send_chat(chat: schemas.ChatHistoryCreate, model_type:int, subscribed:
     }
     
         # raise HTTPException(status_code=400, detail="No free messages left")
+
+@app.post("test/message")
+def get_chatgpt_response_stream(chat: schemas.ChatHistoryCreate, model_type:int, subscribed:schemas.Subscribed, db: Session = Depends(get_db)):
+    model = "gpt-4" if model_type == 1 else "gpt-3.5-turbo" if model_type == 2 else None
+    user = db.query(models.User).filter(models.User.id == chat.user_id).first()
+    
+    # 사용자가 존재하지 않는 경우 처리
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # free_message 값 확인
+    if not subscribed.subscribed and user.free_message <= 0:
+        return {
+        "free_message" : user.free_message
+    } 
+    
+    message = chat.message  # 요청 바디에서 message를 추출
+    # chat history 불러오기
+    chat_history = get_chat_history(chat.chat_id, db)
+    # chat_history를 messages 배열에 추가
+    messages = [{"role": "assistant" if chat.type == 0 else "user", "content": chat.message} for chat in chat_history]
+    messages.append({"role": "user", "content": message})
+
+    response =  openai.ChatCompletion.create(
+                model=model,
+                messages=messages,
+                temperature=0,
+                stream=True
+            )
+    return StreamingResponse(get_streamed_ai_response(response), media_type='text/event-stream')
+
+def get_streamed_ai_response(response):
+    for chunk in response: 
+        yield chunk['choices'][0]['delta'].get("content", "")
 
 
 
