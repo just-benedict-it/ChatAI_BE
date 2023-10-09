@@ -1,66 +1,79 @@
-from pydantic import BaseModel,validator
+
+
+from pydantic import BaseModel, validator
 from datetime import datetime
 
-class User(BaseModel):
+# User Schemas
+class UserBase(BaseModel):
+    os: str
+    country: str
+
+class UserCreate(UserBase):
+    pass
+
+class UserRead(UserBase):
     id: str
     date_joined: datetime
-    os: str
-    country : str
-    class Config:
-        orm_mode = True
 
-class ChatHistory(BaseModel):
+# ChatList Schemas
+class ChatListBase(BaseModel):
+    user_id: str
+    chat_name : str
+
+
+class ChatListCreate(ChatListBase):
+    pass
+
+class ChatListRead(ChatListBase):
     id: int
     chat_id : str
-    user_id: int
+    created_at: datetime
+    favorite_order : int
+    favorite : bool
+    is_del : bool
+
+
+# ChatHistory Schemas
+class ChatHistoryBase(BaseModel):
+    chat_id: str
+    user_id: str
     type: int
-    created_at: datetime
-    message : str
-    class Config:
-        orm_mode = True
+    message: str
 
-class ChatList(BaseModel):
-    id: int
-    chat_id : str
-    user_id: int
-    created_at: datetime
-    class Config:
-        orm_mode = True
+class ChatHistoryCreate(ChatHistoryBase):
+    pass
 
-class StoreLog(BaseModel):
+class ChatHistoryRead(ChatHistoryBase):
     id: int
-    user_id: int
-    platform: int
-    type : int
-    price : int
-    currency : int
     created_at: datetime
-    class Config:
-        orm_mode = True
 
-class UserActivity(BaseModel):
+
+
+# StoreLog Schemas
+class StoreLogBase(BaseModel):
+    user_id: str
+    type : str
+    price: int
+    currency: str
+
+class StoreLogCreate(StoreLogBase):
+    pass
+
+class StoreLogRead(StoreLogBase):
     id: int
+    created_at: datetime
+
+# UserActivity Schemas
+class UserActivityBase(BaseModel):
     activity_type: int
     user_id: str
+
+class UserActivityCreate(UserActivityBase):
+    pass
+
+class UserActivityRead(UserActivityBase):
+    id: int
     created_at: datetime
-    class Config:
-        orm_mode = True
 
-
-
-# class UserActivityCreate(BaseModel):
-#     activity_type: int
-#     user_id: str
-    
-
-# class UserActivityInDB(UserActivityCreate):
-#     id: int
-#     created_at: datetime
-
-#     class Config:
-#         orm_mode = True
-
-
-# class UserActivityInput(BaseModel):
-#     activity_type: int
-#     user_id: int
+class Subscribed(BaseModel):
+    subscribed : bool

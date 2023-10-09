@@ -35,8 +35,7 @@ class StoreLog(Base):
     __tablename__ = "store_log"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     user_id = Column(String(100), index=True)
-    platform = Column(String(50))  # 플랫폼 이름은 50자로 제한
-    type = Column(Integer, index=True)
+    type = Column(String(50), index=True)
     price = Column(Integer)
     currency = Column(String(10))  # 통화 코드는 10자로 제한 (예: USD, KRW)
     created_at = Column(DateTime, default=datetime.utcnow)

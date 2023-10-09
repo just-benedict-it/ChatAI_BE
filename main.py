@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine, func,or_, asc, desc,case
 from datetime import datetime, timedelta
 import uuid
-import schemas_refactored as schemas
+import schemas
 import models
 from database import engine, SessionLocal
 from fastapi.responses import HTMLResponse
@@ -262,26 +262,26 @@ async def update_subscription_status(store_log: schemas.StoreLogCreate, db: Sess
     new_log = models.StoreLog(**store_log.dict())
     db.add(new_log)
     
-    # type에 따른 구독 일자 설정
-    if store_log.type == 1:
-        subscription_days = 0
-    elif store_log.type == 2:
-        subscription_days = 30
-    elif store_log.type == 3:
-        subscription_days = 365
-    else:
-        raise HTTPException(status_code=400, detail="Invalid subscription type")
+    # # type에 따른 구독 일자 설정
+    # if store_log.type == 1:
+    #     subscription_days = 0
+    # elif store_log.type == 2:
+    #     subscription_days = 30
+    # elif store_log.type == 3:
+    #     subscription_days = 365
+    # else:
+    #     raise HTTPException(status_code=400, detail="Invalid subscription type")
     
-    # 해당 사용자의 SubscriptionStatus 조회
-    subscription_status = db.query(models.SubscriptionStatus).filter(models.SubscriptionStatus.user_id == store_log.user_id).first()
+    # # 해당 사용자의 SubscriptionStatus 조회
+    # subscription_status = db.query(models.SubscriptionStatus).filter(models.SubscriptionStatus.user_id == store_log.user_id).first()
     
-    # 사용자의 SubscriptionStatus가 없는 경우 새로 생성
-    if not subscription_status:
-        subscription_status = models.SubscriptionStatus(user_id=store_log.user_id, subscribed=True, expiry_date=datetime.utcnow() + timedelta(days=subscription_days))
-        db.add(subscription_status)
-    else:
-        # 이미 구독 중인 경우 expiry_date 업데이트
-        subscription_status.expiry_date += timedelta(days=subscription_days)
+    # # 사용자의 SubscriptionStatus가 없는 경우 새로 생성
+    # if not subscription_status:
+    #     subscription_status = models.SubscriptionStatus(user_id=store_log.user_id, subscribed=True, expiry_date=datetime.utcnow() + timedelta(days=subscription_days))
+    #     db.add(subscription_status)
+    # else:
+    #     # 이미 구독 중인 경우 expiry_date 업데이트
+    #     subscription_status.expiry_date += timedelta(days=subscription_days)
     
     db.commit()
 
