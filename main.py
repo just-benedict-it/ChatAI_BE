@@ -188,8 +188,8 @@ async def send_chat(chat: schemas.ChatHistoryCreate, model_type:int, subscribed:
     user = db.query(models.User).filter(models.User.id == chat.user_id).first()
     
     # 사용자가 존재하지 않는 경우 처리
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+    # if not user:
+    #     raise HTTPException(status_code=404, detail="User not found")
     
     # free_message 값 확인
     if not subscribed.subscribed and user.free_message <= 0:
