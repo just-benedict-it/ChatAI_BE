@@ -219,6 +219,14 @@ async def send_chat(chat: schemas.ChatHistoryCreate, model_type:int, subscribed:
     
         # raise HTTPException(status_code=400, detail="No free messages left")
 
+# 채팅 전송
+@app.post("/chat/initialChat")
+async def seva_initial_chat(chat: schemas.ChatHistoryCreate, db: Session = Depends(get_db)):
+    # 초기 채팅 저장
+    save_chat(db, chat.user_id, chat.chat_id, type=0, message=chat.message)
+    db.commit()
+
+
 @app.post("test/message")
 def get_chatgpt_response_stream(chat: schemas.ChatHistoryCreate, model_type:int, subscribed:schemas.Subscribed, db: Session = Depends(get_db)):
     model = "gpt-4" if model_type == 1 else "gpt-3.5-turbo" if model_type == 2 else None
@@ -352,4 +360,4 @@ def get_all_subscription_status(db: Session = Depends(get_db)):
 #     import uvicorn
 #     # 나중에 host 부분 변경 필요
 #     # uvicorn.run("main:app", host="10.182.0.2", port=8000, reload=True)
-#     uvicorn.run("main_refactored:app", host="0.0.0.0", port=8000, reload=True)
+#     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
