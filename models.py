@@ -18,7 +18,7 @@ class ChatHistory(Base):
     user_id = Column(String(100), index=True)
     type = Column(Integer, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
-    message = Column(String(1000))  # 메시지는 1000자로 제한
+    message = Column(String(10000))  # 메시지는 1000자로 제한
     
 class ChatList(Base):
     __tablename__ = "chat_list"
