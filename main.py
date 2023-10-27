@@ -14,6 +14,8 @@ from chatgpt import get_chatgpt_response
 from dotenv import load_dotenv
 import os
 import openai
+import time
+
 load_dotenv()
 openai.api_key = os.getenv("CHATGPT_API")
 
@@ -203,12 +205,24 @@ async def send_chat(chat: schemas.ChatHistoryCreate, model_type:int, subscribed:
     chat_history = get_chat_history(chat.chat_id, db)
     # GPT로부터 응답 받기
     ai_response = get_chatgpt_response(message,model_type,chat_history)
+
+    # GPT로부터 응답 받기
     # 사용자 채팅 저장
-    save_chat(db, chat.user_id, chat.chat_id, type=1, message=message)
+    try:
+        save_chat(db, chat.user_id, chat.chat_id, type=1, message=message)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
     # GPT 채팅 저장
-    save_chat(db, chat.user_id, chat.chat_id, type=0, message=ai_response)
+    try:
+        save_chat(db, chat.user_id, chat.chat_id, type=0, message=ai_response)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
     # free_message 값을 1 감소시키기
-    user.free_message -= 1
+    if user : 
+        user.free_message -= 1
     db.commit()
 
     # 채팅 전송 결과 반환
@@ -217,49 +231,12 @@ async def send_chat(chat: schemas.ChatHistoryCreate, model_type:int, subscribed:
         "free_message" : user.free_message
     }
     
-        # raise HTTPException(status_code=400, detail="No free messages left")
-
 # 채팅 전송
 @app.post("/chat/initialChat")
 async def seva_initial_chat(chat: schemas.ChatHistoryCreate, db: Session = Depends(get_db)):
     # 초기 채팅 저장
     save_chat(db, chat.user_id, chat.chat_id, type=0, message=chat.message)
     db.commit()
-
-
-@app.post("test/message")
-def get_chatgpt_response_stream(chat: schemas.ChatHistoryCreate, model_type:int, subscribed:schemas.Subscribed, db: Session = Depends(get_db)):
-    model = "gpt-4" if model_type == 1 else "gpt-3.5-turbo" if model_type == 2 else None
-    user = db.query(models.User).filter(models.User.id == chat.user_id).first()
-    
-    # 사용자가 존재하지 않는 경우 처리
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    # free_message 값 확인
-    if not subscribed.subscribed and user.free_message <= 0:
-        return {
-        "free_message" : user.free_message
-    } 
-    
-    message = chat.message  # 요청 바디에서 message를 추출
-    # chat history 불러오기
-    chat_history = get_chat_history(chat.chat_id, db)
-    # chat_history를 messages 배열에 추가
-    messages = [{"role": "assistant" if chat.type == 0 else "user", "content": chat.message} for chat in chat_history]
-    messages.append({"role": "user", "content": message})
-
-    response =  openai.ChatCompletion.create(
-                model=model,
-                messages=messages,
-                temperature=0,
-                stream=True
-            )
-    return StreamingResponse(get_streamed_ai_response(response), media_type='text/event-stream')
-
-def get_streamed_ai_response(response):
-    for chunk in response: 
-        yield chunk['choices'][0]['delta'].get("content", "")
 
 
 
@@ -325,14 +302,30 @@ def get_subscribed_status(user_id: str):
 def get_chat_history(chat_id: str, db: Session, n:int = 6):
     return db.query(models.ChatHistory).filter(models.ChatHistory.chat_id == chat_id).order_by(models.ChatHistory.created_at.desc()).limit(n).all()
 
-# 채팅 데이터를 저장하는 함수
-def save_chat(db: Session, user_id: str, chat_id : str,type:int,message: str):
-    chat = models.ChatHistory(chat_id=chat_id, user_id=user_id, type=type,  created_at=datetime.now() + timedelta(hours=9), message=message)
-    db.add(chat)
-    db.commit()
-    db.refresh(chat)
-    return chat
+# # 채팅 데이터를 저장하는 함수
+# def save_chat(db: Session, user_id: str, chat_id : str,type:int,message: str):
+#     chat = models.ChatHistory(chat_id=chat_id, user_id=user_id, type=type,  created_at=datetime.now() + timedelta(hours=9), message=message)
+#     db.add(chat)
+#     db.commit()
+#     db.refresh(chat)
+#     return chat
 
+from sqlalchemy.exc import SQLAlchemyError
+
+def save_chat(db: Session, user_id: str, chat_id: str, type: int, message: str):
+    try:
+        # 채팅 정보를 생성하고 데이터베이스에 추가
+        chat = models.ChatHistory(chat_id=chat_id, user_id=user_id, type=type, created_at=datetime.now() + timedelta(hours=9), message=message)
+        db.add(chat)
+        db.commit()
+        db.refresh(chat)
+        return chat
+    except SQLAlchemyError as e:
+        # 오류 발생 시, 데이터베이스 세션 롤백
+        db.rollback()
+        print(f"An error occurred while saving chat: {e}")  # 로깅을 위해 오류 메시지 출력
+        # 여기서 오류를 기록하거나 추가 조치를 취할 수 있습니다. 예를 들어, 오류를 로깅하거나 특정 조건에 따라 재시도할 수 있습니다.
+        return None  # 채팅 저장 실패를 나타내는 None 반환
 
 
 
