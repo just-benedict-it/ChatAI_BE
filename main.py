@@ -171,7 +171,7 @@ def get_chat_history_by_chatId(chat_id: str, db: Session = Depends(get_db)):
     return formatted_chat_history
 
 # 무료 채팅 개수 불러오기
-@app.get("/user/free_message/{user_id}")
+@app.get("/free_message/{user_id}")
 def get_free_message(user_id: str, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     
@@ -180,9 +180,19 @@ def get_free_message(user_id: str, db: Session = Depends(get_db)):
     
     return {"free_message": user.free_message}
 
-# @app.put("/user/free_message")
-# def get_free_message():
-#     return None
+# 무료 채팅 개수 업데이트
+@app.post("/user/update_free_message/{user_id}")
+def update_free_message(user_id: str, free_message: int, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user.free_message += free_message
+    db.commit()
+    
+    return {"message": "Free messages updated successfully."}
+
 
 # 채팅 전송
 @app.post("/chat/send")
