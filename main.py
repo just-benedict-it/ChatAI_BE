@@ -199,15 +199,22 @@ def update_free_message(user_id: str, free_message: int, db: Session = Depends(g
 async def send_chat(chat: schemas.ChatHistoryCreate, model_type:int, subscribed:schemas.Subscribed, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == chat.user_id).first()
     
-    # 사용자가 존재하지 않는 경우 처리
-    # if not user:
-    #     raise HTTPException(status_code=404, detail="User not found")
-    
+    # 사용자가 존재하지 않는 경우, 특정 응답 반환
+    if not user:
+        # 사용자가 존재하지 않는 경우 에러 로깅 및 저장
+        error_message = "User not found"
+        save_chat(db, error_message, error_message, type=4, message=error_message)
+        return {
+            "ai_response": "An error has occurred. Please close the app and try again!",
+            "free_message": 0  # 사용자가 없으므로 free_message는 0으로 설정
+        }
+
     # free_message 값 확인
     if not subscribed.subscribed and user.free_message <= 0:
         return {
-        "free_message" : user.free_message
-    } 
+            "ai_response": "Free Message has been used up!",
+            "free_message": user.free_message
+        }
   
     
     message = chat.message  # 요청 바디에서 message를 추출
@@ -221,12 +228,17 @@ async def send_chat(chat: schemas.ChatHistoryCreate, model_type:int, subscribed:
     try:
         save_chat(db, chat.user_id, chat.chat_id, type=1, message=message)
     except Exception as e:
+        error_message = "Error Saving User Chat"
+        save_chat(db, error_message, error_message, type=2, message=e)
+
         print(f"An error occurred: {e}")
 
     # GPT 채팅 저장
     try:
         save_chat(db, chat.user_id, chat.chat_id, type=0, message=ai_response)
     except Exception as e:
+        error_message = "Error Saving Bot Chat"
+        save_chat(db, error_message, error_message, type=3, message=e)
         print(f"An error occurred: {e}")
 
 
