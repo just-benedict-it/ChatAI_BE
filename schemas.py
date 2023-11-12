@@ -77,3 +77,10 @@ class UserActivityRead(UserActivityBase):
 
 class Subscribed(BaseModel):
     subscribed : bool
+
+class AdLogBase(BaseModel):
+    user_id: str
+    
+
+class AdLogCreate(AdLogBase):
+    pass

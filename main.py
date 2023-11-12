@@ -349,6 +349,16 @@ def save_chat(db: Session, user_id: str, chat_id: str, type: int, message: str):
         # 여기서 오류를 기록하거나 추가 조치를 취할 수 있습니다. 예를 들어, 오류를 로깅하거나 특정 조건에 따라 재시도할 수 있습니다.
         return None  # 채팅 저장 실패를 나타내는 None 반환
 
+# 유저 접속 기록 (매일 최초 1회)
+@app.post("/ad_log/")
+def create_ad_log(ad_log: schemas.AdLogCreate, db: Session = Depends(get_db)):
+    new_ad_log = models.AdLog(**ad_log.dict())
+    db.add(new_ad_log)
+    db.commit()
+    db.refresh(new_ad_log)
+    return new_ad_log
+
+
 
 
 @app.get("/users/")
@@ -370,6 +380,12 @@ def get_all_user_activities(db: Session = Depends(get_db)):
 @app.get("/get_all_subscription_status/")
 def get_all_subscription_status(db: Session = Depends(get_db)):
     return db.query(models.SubscriptionStatus).all()
+
+
+
+
+
+
 
 # if __name__ == "__main__":
 #     import uvicorn

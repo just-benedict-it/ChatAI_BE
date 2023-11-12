@@ -54,3 +54,9 @@ class SubscriptionStatus(Base):
     subscribed = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     expiry_date = Column(DateTime)
+
+class AdLog(Base):
+    __tablename__ = "ad_log"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    user_id = Column(String(100), index=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
