@@ -29,7 +29,8 @@ def get_chatgpt_response(message, model_type, chat_history=[]):
     # openai 라이브러리에 API 키 설정
     openai.api_key = api_key
 
-    model = "gpt-4" if model_type == 1 else "gpt-3.5-turbo" if model_type == 2 else None
+    # model = "gpt-4" if model_type == 1 else "gpt-3.5-turbo" if model_type == 2 else None
+    model = "gpt-4-1106-preview" if model_type == 1 else "gpt-3.5-turbo-1106" if model_type == 2 else None
 
     # chat_history를 messages 배열에 추가
     messages = [{"role": "assistant" if chat.type == 0 else "user", "content": chat.message} for chat in chat_history]
