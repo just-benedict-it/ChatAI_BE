@@ -390,8 +390,8 @@ def get_all_subscription_status(db: Session = Depends(get_db)):
 
 
 
-if __name__ == "__main__":
-    import uvicorn
-    # 나중에 host 부분 변경 필요
-    # uvicorn.run("main:app", host="10.182.0.2", port=8000, reload=True)
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+# if __name__ == "__main__":
+#     import uvicorn
+#     # 나중에 host 부분 변경 필요
+#     # uvicorn.run("main:app", host="10.182.0.2", port=8000, reload=True)
+#     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
