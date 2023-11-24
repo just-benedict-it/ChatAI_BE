@@ -30,9 +30,20 @@ async def get_chatgpt_response(message, model_type, chat_history=[]):
     # openai 라이브러리에 API 키 설정
     openai.api_key = api_key
 
-    # model = "gpt-4" if model_type == 1 else "gpt-3.5-turbo" if model_type == 2 else None
-    model = "gpt-4-1106-preview" if model_type == 1 else "gpt-3.5-turbo-1106" if model_type == 2 else None
+    # # model = "gpt-4" if model_type == 1 else "gpt-3.5-turbo" if model_type == 2 else None
+    # model = "gpt-4-1106-preview" if model_type == 1 else "gpt-3.5-turbo-1106" if model_type == 2 else None
 
+    # model 및 request_timeout 설정
+    if model_type == 1:
+        model = "gpt-4-1106-preview"
+        request_timeout = 25  # GPT-4 모델에 대한 타임아웃
+    elif model_type == 2:
+        model = "gpt-3.5-turbo-1106"
+        request_timeout = 15  # GPT-3.5 모델에 대한 타임아웃
+    else:
+        model = None
+        request_timeout = None
+        
     # chat_history를 messages 배열에 추가
     messages = [{"role": "assistant" if chat.type == 0 else "user", "content": chat.message} for chat in chat_history]
     messages.append({"role": "user", "content": message})
@@ -46,7 +57,7 @@ async def get_chatgpt_response(message, model_type, chat_history=[]):
                 model=model,
                 messages=messages,
                 temperature=0,
-                request_timeout=15,
+                request_timeout=request_timeout,
                 max_tokens = 256
             )
             break  # 성공적으로 응답을 받았으므로 반복문 탈출
