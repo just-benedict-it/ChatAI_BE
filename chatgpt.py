@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import os
 import openai
 from itertools import cycle
+import time
 
 load_dotenv()
 api_keys = [
@@ -22,7 +23,7 @@ def get_next_api_key():
     global api_key_cycle
     return next(api_key_cycle)
 
-def get_chatgpt_response(message, model_type, chat_history=[]):
+async def get_chatgpt_response(message, model_type, chat_history=[]):
     # 다음 API 키를 가져옵니다.
     api_key = get_next_api_key()
 
@@ -36,10 +37,86 @@ def get_chatgpt_response(message, model_type, chat_history=[]):
     messages = [{"role": "assistant" if chat.type == 0 else "user", "content": chat.message} for chat in chat_history]
     messages.append({"role": "user", "content": message})
 
-    response = openai.ChatCompletion.create(
+
+    response = None
+    retries = 3    
+    while retries > 0: 
+        try:
+            response = openai.ChatCompletion.create(
                 model=model,
                 messages=messages,
                 temperature=0,
+                request_timeout=15,
+                max_tokens = 256
             )
-    return response.choices[0].message.content
+            break  # 성공적으로 응답을 받았으므로 반복문 탈출
+        except Exception as e:    
+            print(e)   
+            print('Timeout error, retrying...')    
+            retries -= 1    
+            time.sleep(2)    
 
+    if response:
+        return response.choices[0].message.content
+    else: 
+        return "Please try later"
+
+   # except openai.APIError as e:
+    #     #Handle API error here, e.g. retry or log
+    #     print(f"OpenAI API returned an API Error: {e}")
+    #     time.sleep(5)
+    #     return get_chatgpt_response(message, model_type, chat_history=[])
+    # except openai.APIConnectionError as e:
+    #     #Handle connection error here
+    #     print(f"Failed to connect to OpenAI API: {e}")
+    #     time.sleep(5)
+    #     return get_chatgpt_response(message, model_type, chat_history=[])
+    # except openai.RateLimitError as e:
+    #     #Handle rate limit error (we recommend using exponential backoff)
+    #     print(f"OpenAI API request exceeded rate limit: {e}")
+    #     time.sleep(5)
+    #     return get_chatgpt_response(message, model_type, chat_history=[])
+    # except openai.error.Timeout as e:
+    #     # Handle timeout error, e.g. retry or log
+    #     print(f"OpenAI API request timed out: {e}")
+    #     time.sleep(5)
+    #     return get_chatgpt_response(message, model_type, chat_history=[])
+    # except openai.error.APIError as e:
+    #     # Handle API error, e.g. retry or log
+    #     print(f"OpenAI API returned an API Error: {e}")
+    #     time.sleep(5)
+    #     return get_chatgpt_response(message, model_type, chat_history=[])
+    # except openai.error.APIConnectionError as e:
+    #     # Handle connection error, e.g. check network or log
+    #     print(f"OpenAI API request failed to connect: {e}")
+    #     time.sleep(5)
+    #     return get_chatgpt_response(message, model_type, chat_history=[])
+    # except openai.error.APITimeoutError as e:
+    #     # Handle connection error, e.g. check network or log
+    #     print(f"OpenAI API request failed to connect: {e}")
+    #     time.sleep(5)
+    #     return get_chatgpt_response(message, model_type, chat_history=[])
+    # except openai.error.InvalidRequestError as e:
+    #     # Handle invalid request error, e.g. validate parameters or log
+    #     print(f"OpenAI API request was invalid: {e}")
+    #     time.sleep(5)
+    #     return get_chatgpt_response(message, model_type, chat_history=[])
+    # except openai.error.AuthenticationError as e:
+    #     # Handle authentication error, e.g. check credentials or log
+    #     print(f"OpenAI API request was not authorized: {e}")
+    #     time.sleep(5)
+    #     return get_chatgpt_response(message, model_type, chat_history=[])
+    # except openai.error.PermissionError as e:
+    #     # Handle permission error, e.g. check scope or log
+    #     print(f"OpenAI API request was not permitted: {e}")
+    #     time.sleep(5)
+    #     return get_chatgpt_response(message, model_type, chat_history=[])
+    # except openai.error.RateLimitError as e:
+    #     # Handle rate limit error, e.g. wait or log
+    #     print(f"OpenAI API request exceeded rate limit: {e}")
+    #     time.sleep(5)
+    #     return get_chatgpt_response(message, model_type, chat_history=[])
+    
+
+    # try-error retry
+    # timeout, 각각의 에러에 대해서 잡아야 함.

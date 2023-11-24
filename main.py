@@ -197,6 +197,7 @@ def update_free_message(user_id: str, free_message: int, db: Session = Depends(g
 # 채팅 전송
 @app.post("/chat/send")
 async def send_chat(chat: schemas.ChatHistoryCreate, model_type:int, subscribed:schemas.Subscribed, db: Session = Depends(get_db)):
+    start_time = time.time()
     user = db.query(models.User).filter(models.User.id == chat.user_id).first()
     
     # 사용자가 존재하지 않는 경우, 특정 응답 반환
@@ -221,7 +222,7 @@ async def send_chat(chat: schemas.ChatHistoryCreate, model_type:int, subscribed:
     # chat history 불러오기
     chat_history = get_chat_history(chat.chat_id, db)
     # GPT로부터 응답 받기
-    ai_response = get_chatgpt_response(message,model_type,chat_history)
+    ai_response =  await get_chatgpt_response(message,model_type,chat_history)
 
     # GPT로부터 응답 받기
     # 사용자 채팅 저장
@@ -246,7 +247,9 @@ async def send_chat(chat: schemas.ChatHistoryCreate, model_type:int, subscribed:
     if user : 
         user.free_message -= 1
     db.commit()
+    end_time = time.time()
 
+    print("총 실행 시간:", end_time - start_time, "초")
     # 채팅 전송 결과 반환
     return {
         "ai_response": ai_response,
@@ -387,8 +390,8 @@ def get_all_subscription_status(db: Session = Depends(get_db)):
 
 
 
-# if __name__ == "__main__":
-#     import uvicorn
-#     # 나중에 host 부분 변경 필요
-#     # uvicorn.run("main:app", host="10.182.0.2", port=8000, reload=True)
-#     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+if __name__ == "__main__":
+    import uvicorn
+    # 나중에 host 부분 변경 필요
+    # uvicorn.run("main:app", host="10.182.0.2", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
