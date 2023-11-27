@@ -60,3 +60,9 @@ class AdLog(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     user_id = Column(String(100), index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+class ErrorLog(Base):
+    __tablename__ = "error_log"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    error_message = Column(String(100), index=True)
+    created_at = Column(DateTime, default=datetime.utcnow)

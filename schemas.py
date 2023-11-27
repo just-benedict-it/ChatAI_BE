@@ -84,3 +84,10 @@ class AdLogBase(BaseModel):
 
 class AdLogCreate(AdLogBase):
     pass
+
+class ErrorLogBase(BaseModel):
+    error_message: str
+    
+
+class ErrorLogCreate(ErrorLogBase):
+    pass

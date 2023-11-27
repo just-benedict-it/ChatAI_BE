@@ -361,7 +361,14 @@ def create_ad_log(ad_log: schemas.AdLogCreate, db: Session = Depends(get_db)):
     db.refresh(new_ad_log)
     return new_ad_log
 
-
+# 에러 로그 
+@app.post("/error_log/")
+def create_error_log(error_log: schemas.ErrorLogCreate, db: Session = Depends(get_db)):
+    new_error_log = models.ErrorLog(**error_log.dict())
+    db.add(new_error_log)
+    db.commit()
+    db.refresh(new_error_log)
+    return new_error_log
 
 
 @app.get("/users/")
