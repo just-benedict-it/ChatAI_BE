@@ -385,11 +385,6 @@ def get_all_subscription_status(db: Session = Depends(get_db)):
     return db.query(models.SubscriptionStatus).all()
 
 
-
-
-
-
-
 # if __name__ == "__main__":
 #     import uvicorn
 #     # 나중에 host 부분 변경 필요

@@ -58,7 +58,7 @@ async def get_chatgpt_response(message, model_type, chat_history=[]):
                 messages=messages,
                 temperature=0,
                 request_timeout=request_timeout,
-                max_tokens = 256
+                max_tokens = 1024
             )
             break  # 성공적으로 응답을 받았으므로 반복문 탈출
         except Exception as e:    
