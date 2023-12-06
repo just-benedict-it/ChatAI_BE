@@ -91,3 +91,7 @@ class ErrorLogBase(BaseModel):
 
 class ErrorLogCreate(ErrorLogBase):
     pass
+
+class InitialPrompt(BaseModel):
+    role: str
+    content: str

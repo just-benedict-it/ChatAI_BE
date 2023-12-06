@@ -15,6 +15,10 @@ from dotenv import load_dotenv
 import os
 import openai
 import time
+from fastapi import Body
+from typing import List
+
+
 
 load_dotenv()
 openai.api_key = os.getenv("CHATGPT_API")
@@ -196,7 +200,7 @@ def update_free_message(user_id: str, free_message: int, db: Session = Depends(g
 
 # 채팅 전송
 @app.post("/chat/send")
-async def send_chat(chat: schemas.ChatHistoryCreate, model_type:int, subscribed:schemas.Subscribed, db: Session = Depends(get_db)):
+async def send_chat(chat: schemas.ChatHistoryCreate, model_type:int,  subscribed:schemas.Subscribed, initialPrompt: List[schemas.InitialPrompt] = Body(default=[]),  db: Session = Depends(get_db)):
     start_time = time.time()
     user = db.query(models.User).filter(models.User.id == chat.user_id).first()
     
@@ -221,6 +225,14 @@ async def send_chat(chat: schemas.ChatHistoryCreate, model_type:int, subscribed:
     message = chat.message  # 요청 바디에서 message를 추출
     # chat history 불러오기
     chat_history = get_chat_history(chat.chat_id, db)
+    
+    for prompt in reversed(initialPrompt):
+        chat_history.insert(0, schemas.ChatHistoryCreate(
+            chat_id=chat.chat_id,
+            user_id=chat.user_id,  # 혹은 적절한 user_id 설정
+            type=0 if prompt.role == "assistant" else 1,  # role에 따라 type 설정
+            message=prompt.content
+        ))
     # GPT로부터 응답 받기
     ai_response =  await get_chatgpt_response(message,model_type,chat_history)
 

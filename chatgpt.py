@@ -30,10 +30,6 @@ async def get_chatgpt_response(message, model_type, chat_history=[]):
     # openai 라이브러리에 API 키 설정
     openai.api_key = api_key
 
-    # # model = "gpt-4" if model_type == 1 else "gpt-3.5-turbo" if model_type == 2 else None
-    # model = "gpt-4-1106-preview" if model_type == 1 else "gpt-3.5-turbo-1106" if model_type == 2 else None
-
-    # model 및 request_timeout 설정
     if model_type == 1:
         model = "gpt-4-1106-preview"
         request_timeout = 25  # GPT-4 모델에 대한 타임아웃
@@ -71,63 +67,3 @@ async def get_chatgpt_response(message, model_type, chat_history=[]):
         return response.choices[0].message.content
     else: 
         return "Please try later"
-
-   # except openai.APIError as e:
-    #     #Handle API error here, e.g. retry or log
-    #     print(f"OpenAI API returned an API Error: {e}")
-    #     time.sleep(5)
-    #     return get_chatgpt_response(message, model_type, chat_history=[])
-    # except openai.APIConnectionError as e:
-    #     #Handle connection error here
-    #     print(f"Failed to connect to OpenAI API: {e}")
-    #     time.sleep(5)
-    #     return get_chatgpt_response(message, model_type, chat_history=[])
-    # except openai.RateLimitError as e:
-    #     #Handle rate limit error (we recommend using exponential backoff)
-    #     print(f"OpenAI API request exceeded rate limit: {e}")
-    #     time.sleep(5)
-    #     return get_chatgpt_response(message, model_type, chat_history=[])
-    # except openai.error.Timeout as e:
-    #     # Handle timeout error, e.g. retry or log
-    #     print(f"OpenAI API request timed out: {e}")
-    #     time.sleep(5)
-    #     return get_chatgpt_response(message, model_type, chat_history=[])
-    # except openai.error.APIError as e:
-    #     # Handle API error, e.g. retry or log
-    #     print(f"OpenAI API returned an API Error: {e}")
-    #     time.sleep(5)
-    #     return get_chatgpt_response(message, model_type, chat_history=[])
-    # except openai.error.APIConnectionError as e:
-    #     # Handle connection error, e.g. check network or log
-    #     print(f"OpenAI API request failed to connect: {e}")
-    #     time.sleep(5)
-    #     return get_chatgpt_response(message, model_type, chat_history=[])
-    # except openai.error.APITimeoutError as e:
-    #     # Handle connection error, e.g. check network or log
-    #     print(f"OpenAI API request failed to connect: {e}")
-    #     time.sleep(5)
-    #     return get_chatgpt_response(message, model_type, chat_history=[])
-    # except openai.error.InvalidRequestError as e:
-    #     # Handle invalid request error, e.g. validate parameters or log
-    #     print(f"OpenAI API request was invalid: {e}")
-    #     time.sleep(5)
-    #     return get_chatgpt_response(message, model_type, chat_history=[])
-    # except openai.error.AuthenticationError as e:
-    #     # Handle authentication error, e.g. check credentials or log
-    #     print(f"OpenAI API request was not authorized: {e}")
-    #     time.sleep(5)
-    #     return get_chatgpt_response(message, model_type, chat_history=[])
-    # except openai.error.PermissionError as e:
-    #     # Handle permission error, e.g. check scope or log
-    #     print(f"OpenAI API request was not permitted: {e}")
-    #     time.sleep(5)
-    #     return get_chatgpt_response(message, model_type, chat_history=[])
-    # except openai.error.RateLimitError as e:
-    #     # Handle rate limit error, e.g. wait or log
-    #     print(f"OpenAI API request exceeded rate limit: {e}")
-    #     time.sleep(5)
-    #     return get_chatgpt_response(message, model_type, chat_history=[])
-    
-
-    # try-error retry
-    # timeout, 각각의 에러에 대해서 잡아야 함.
