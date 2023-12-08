@@ -391,6 +391,15 @@ async def get_all_profiles(db: Session = Depends(get_db)):
 def get_all_chat_history(db: Session = Depends(get_db)):
     return db.query(models.ChatHistory).all()
 
+@app.get("/chat_list/{chat_id}/")
+def get_chat_list(chat_id:str, db: Session = Depends(get_db)):
+	chat_list = db.query(models.ChatList).filter(models.ChatList.chat_id == chat_id).first()
+	if chat_list:	
+			return {'img_url': chat_list.img_url}
+	else:
+			raise HTTPException(status_code=404, detail="ChatList not found")
+    
+
 @app.get("/chat_list")
 def get_all_chat_list(db: Session = Depends(get_db)):
     return db.query(models.ChatList).all()
