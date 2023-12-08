@@ -29,7 +29,9 @@ class ChatList(Base):
     favorite = Column(Boolean, default=False, index=True)
     favorite_order = Column(Integer, autoincrement=True)
     is_del = Column(Boolean, default=False, index=True)
+    img_url = Column(String(255), index=True, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+    
 
 class StoreLog(Base):
     __tablename__ = "store_log"

@@ -2,6 +2,7 @@
 
 from pydantic import BaseModel, validator
 from datetime import datetime
+from typing import Optional
 
 # User Schemas
 class UserBase(BaseModel):
@@ -19,6 +20,7 @@ class UserRead(UserBase):
 class ChatListBase(BaseModel):
     user_id: str
     chat_name : str
+    img_url : Optional[str] = None
 
 
 class ChatListCreate(ChatListBase):
