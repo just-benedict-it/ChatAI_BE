@@ -9,7 +9,7 @@ class User(Base):
     date_joined = Column(DateTime, default=datetime.utcnow)
     os = Column(String(50))  # OS 이름은 50자로 제한
     country = Column(String(50))  # 국가 이름은 50자로 제한
-    free_message = Column(Integer, default=5)
+    free_message = Column(Integer, default=3)
 
 class ChatHistory(Base):
     __tablename__ = "chat_history"
