@@ -382,6 +382,14 @@ def create_error_log(error_log: schemas.ErrorLogCreate, db: Session = Depends(ge
     db.refresh(new_error_log)
     return new_error_log
 
+# 챗봇카드 로그 
+@app.post("/chatbotcard_log/")
+def create_chatbotcard_log(chatbotcard_log: schemas.ChatBotCardCreate, db: Session = Depends(get_db)):
+    new_chatbotcard_log = models.ChatBotCardLog(**chatbotcard_log.dict())
+    db.add(new_chatbotcard_log)
+    db.commit()
+    db.refresh(new_chatbotcard_log)
+    return new_chatbotcard_log
 
 @app.get("/users/")
 async def get_all_profiles(db: Session = Depends(get_db)):

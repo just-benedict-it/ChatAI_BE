@@ -89,7 +89,7 @@ class AdLogCreate(AdLogBase):
 
 class ErrorLogBase(BaseModel):
     error_message: str
-    
+
 
 class ErrorLogCreate(ErrorLogBase):
     pass
@@ -97,3 +97,10 @@ class ErrorLogCreate(ErrorLogBase):
 class InitialPrompt(BaseModel):
     role: str
     content: str
+    
+class ChatBotCardBase(BaseModel):
+    chatbotcard: str
+    user_id: str
+
+class ChatBotCardCreate(ChatBotCardBase):
+    pass
