@@ -80,6 +80,7 @@ def get_user_chat_list(user_id: str, db: Session = Depends(get_db)):
                  asc(models.ChatList.favorite_order),  # 2. 그 중에서도 favorite_order가 높은 순서대로
                  desc(models.ChatList.created_at)  # 3. 그 다음엔 favorite=false인 것들, 날짜순서대로
              )
+             .limit(10)
              .all())
     return chats
 

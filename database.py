@@ -19,9 +19,6 @@ database_stg = os.getenv("DATABASE_STG")
 DB_URL = f"mysql+pymysql://{user_name}:{password}@{host}:{port}/{database}?charset=utf8"
 DB_STG_URL = f"mysql+pymysql://{user_name}:{password}@{host}:{port_stg}/{database_stg}?charset=utf8"
 
-# print(DB_URL)
-# print(DB_STG_URL)
-
 # 데이터베이스 설정
 engine = create_engine(
     DB_URL, encoding='utf-8'

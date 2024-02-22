@@ -1,5 +1,5 @@
 from database import Base
-from sqlalchemy import Column, Integer, Float, String, ForeignKey, DateTime, Boolean
+from sqlalchemy import Column, Integer, Float, String, ForeignKey, DateTime, Boolean, Index
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
@@ -27,10 +27,14 @@ class ChatList(Base):
     user_id = Column(String(100), index=True)
     chat_name = Column(String(100), index=True)
     favorite = Column(Boolean, default=False, index=True)
-    favorite_order = Column(Integer, autoincrement=True)
+    favorite_order = Column(Integer, autoincrement=True, index=True)
     is_del = Column(Boolean, default=False, index=True)
     img_url = Column(String(255), index=True, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+    __table_args__ = (
+        Index('idx_chat_list_user_id_is_del', 'user_id', 'is_del'),
+        Index('idx_chat_list_favorite_order', 'favorite', 'favorite_order', 'created_at'),
+    )
     
 
 class StoreLog(Base):
