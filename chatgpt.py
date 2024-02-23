@@ -31,10 +31,10 @@ async def get_chatgpt_response(message, model_type, chat_history=[]):
     openai.api_key = api_key
 
     if model_type == 1:
-        model = "gpt-4-1106-preview"
+        model = "gpt-4-0125-preview"
         request_timeout = 25  # GPT-4 모델에 대한 타임아웃
     elif model_type == 2:
-        model = "gpt-3.5-turbo-1106"
+        model = "gpt-3.5-turbo-0125"
         request_timeout = 15  # GPT-3.5 모델에 대한 타임아웃
     else:
         model = None
