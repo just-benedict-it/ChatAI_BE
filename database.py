@@ -21,7 +21,7 @@ DB_STG_URL = f"mysql+pymysql://{user_name}:{password}@{host}:{port_stg}/{databas
 
 # 데이터베이스 설정
 engine = create_engine(
-    DB_URL, encoding='utf-8'
+    DB_URL
 
     # DB_STG_URL, encoding='utf-8'
 )

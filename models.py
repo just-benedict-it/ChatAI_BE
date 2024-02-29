@@ -10,6 +10,7 @@ class User(Base):
     os = Column(String(50))  # OS 이름은 50자로 제한
     country = Column(String(50))  # 국가 이름은 50자로 제한
     free_message = Column(Integer, default=3)
+    used_message = Column(Integer, default=0)
 
 class ChatHistory(Base):
     __tablename__ = "chat_history"
