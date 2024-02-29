@@ -257,9 +257,10 @@ async def send_chat(chat: schemas.ChatHistoryCreate, model_type:int,  subscribed
 
 
     # free_message 값을 1 감소시키기
-    if user : 
+    if user:
         user.free_message -= 1
-        user.used_message +=1
+        user.used_message = (user.used_message or 0) + 1
+
     db.commit()
     end_time = time.time()
 
