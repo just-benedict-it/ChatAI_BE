@@ -267,7 +267,8 @@ async def send_chat(chat: schemas.ChatHistoryCreate, model_type:int,  subscribed
     # 채팅 전송 결과 반환
     return {
         "ai_response": ai_response,
-        "free_message" : user.free_message
+        "free_message" : user.free_message,
+        "used_message": 0 if user.used_message is None else user.used_message
     }
     
 # 채팅 전송
