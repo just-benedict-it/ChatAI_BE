@@ -69,6 +69,7 @@ class StoreLogRead(StoreLogBase):
 class UserActivityBase(BaseModel):
     activity_type: int
     user_id: str
+    activity_action: Optional[str] = None
 
 class UserActivityCreate(UserActivityBase):
     pass

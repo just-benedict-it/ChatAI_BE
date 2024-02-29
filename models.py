@@ -51,6 +51,7 @@ class UserActivity(Base):
     __tablename__ = "user_activity"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     activity_type = Column(Integer, index=True)
+    activity_action = Column(Integer, index=True)
     user_id = Column(String(100), index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
