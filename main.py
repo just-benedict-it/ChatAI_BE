@@ -17,6 +17,7 @@ import openai
 import time
 from fastapi import Body
 from typing import List
+from claude import get_claude_response
 
 
 
@@ -234,7 +235,8 @@ async def send_chat(chat: schemas.ChatHistoryCreate, model_type:int,  subscribed
             message=prompt.content
         ))
     # GPT로부터 응답 받기
-    ai_response =  await get_chatgpt_response(message,model_type,chat_history)
+    # ai_response =  await get_chatgpt_response(message,model_type,chat_history)
+    ai_response =  await get_claude_response(message,model_type,chat_history)
 
     # GPT로부터 응답 받기
     # 사용자 채팅 저장
@@ -424,8 +426,8 @@ def get_all_subscription_status(db: Session = Depends(get_db)):
     return db.query(models.SubscriptionStatus).all()
 
 
-# if __name__ == "__main__":
-#     import uvicorn
-#     # 나중에 host 부분 변경 필요
-#     # uvicorn.run("main:app", host="10.182.0.2", port=8000, reload=True)
-#     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+if __name__ == "__main__":
+    import uvicorn
+    # 나중에 host 부분 변경 필요
+    # uvicorn.run("main:app", host="10.182.0.2", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
