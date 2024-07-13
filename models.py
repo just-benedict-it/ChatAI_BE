@@ -11,6 +11,9 @@ class User(Base):
     country = Column(String(50))  # 국가 이름은 50자로 제한
     free_message = Column(Integer, default=3)
     used_message = Column(Integer, default=0)
+    subscribed = Column(Boolean, default=False, index=True)
+    is_test = Column(Boolean, default=False, index=True)
+    experiment = Column(Boolean, default=False, index=True)
 
 class ChatHistory(Base):
     __tablename__ = "chat_history"

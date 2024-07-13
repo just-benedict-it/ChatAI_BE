@@ -1,5 +1,5 @@
 .env
 secrets.json
-alembic.ini
-alembic_stg.ini
-alembic_production.ini
+# alembic.ini
+# alembic_stg.ini
+# alembic_production.ini

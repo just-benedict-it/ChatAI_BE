@@ -218,7 +218,7 @@ async def send_chat(chat: schemas.ChatHistoryCreate, model_type:int,  subscribed
     # free_message 값 확인
     if not subscribed.subscribed and user.free_message <= 0:
         return {
-            "ai_response": "Free Message has been used up!",
+            "ai_response": "You've used all your free messages. To continue chatting, please subscribe.",
             "free_message": user.free_message
         }
   
@@ -424,6 +424,22 @@ def get_all_user_activities(db: Session = Depends(get_db)):
 @app.get("/get_all_subscription_status/")
 def get_all_subscription_status(db: Session = Depends(get_db)):
     return db.query(models.SubscriptionStatus).all()
+
+
+# 유저 정보 업데이트
+@app.put("/users/{user_id}")
+def update_user(user_id: str, user_update: schemas.UserUpdate, db: Session = Depends(get_db)):
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user_data = user_update.model_dump(exclude_unset=True)
+    for key, value in user_data.items():
+        setattr(db_user, key, value)
+
+    db.commit()
+    db.refresh(db_user)
+    return db_user
 
 
 if __name__ == "__main__":

@@ -16,6 +16,15 @@ class UserRead(UserBase):
     id: str
     date_joined: datetime
 
+class UserUpdate(BaseModel):
+    os: Optional[str] = None
+    country: Optional[str] = None
+    free_message: Optional[int] = None
+    used_message: Optional[int] = None
+    subscribed: Optional[bool] = None
+    is_test: Optional[bool] = None
+    experiment: Optional[bool] = None
+
 # ChatList Schemas
 class ChatListBase(BaseModel):
     user_id: str
