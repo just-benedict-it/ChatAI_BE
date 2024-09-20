@@ -18,7 +18,7 @@ import time
 from fastapi import Body
 from typing import List
 from claude import get_claude_response
-
+from dalle import get_dalle_response
 
 
 load_dotenv()
@@ -197,6 +197,14 @@ def update_free_message(user_id: str, free_message: int, db: Session = Depends(g
     db.commit()
     
     return {"message": "Free messages updated successfully."}
+
+
+# 이미지 생성
+@app.post("/chat/dalle")
+async def create_image(message:str):
+    ai_response =  await get_dalle_response(message)
+    return ai_response
+
 
 
 # 채팅 전송
