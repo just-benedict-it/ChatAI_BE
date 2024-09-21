@@ -207,7 +207,7 @@ def update_free_message(user_id: str, free_message: int, db: Session = Depends(g
 #     return ai_response
 
 
-DALLE_MONTHLY_LIMIT = 50
+DALLE_MONTHLY_LIMIT = 6
 
 @app.post("/chat/dalle")
 async def create_image(user_id: str, message: str, db: Session = Depends(get_db)):
