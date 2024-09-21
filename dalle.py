@@ -12,24 +12,17 @@ async def get_dalle_response(message):
     client = OpenAI(api_key=API_KEY)
 
     response = None
-    retries = 3    
-    while retries > 0: 
-        try:
-            response = client.images.generate(
-                model="dall-e-2",
-                prompt=message,
-                # size="1024x1024",
-                size="256x256",
-                quality="standard",
-                n=1,
-            )
-            break  # 성공적으로 응답을 받았으므로 반복문 탈출
-        except Exception as e:    
-            print(e)   
-            print('Timeout error, retrying...')    
-            retries -= 1    
-            time.sleep(2)    
-
+    try:
+        response = client.images.generate(
+            model="dall-e-2",
+            prompt=message,
+            # size="1024x1024",
+            size="256x256",
+            quality="standard",
+            n=1,
+        )
+    except Exception as e:    
+        print(e)   
     if response:
         return response.data[0].url
     else: 

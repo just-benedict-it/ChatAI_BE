@@ -19,6 +19,7 @@ from fastapi import Body
 from typing import List
 from claude import get_claude_response
 from dalle import get_dalle_response
+from sqlalchemy.exc import SQLAlchemyError
 
 
 load_dotenv()
@@ -199,13 +200,68 @@ def update_free_message(user_id: str, free_message: int, db: Session = Depends(g
     return {"message": "Free messages updated successfully."}
 
 
-# 이미지 생성
+# # 이미지 생성
+# @app.post("/chat/dalle")
+# async def create_image(message:str):
+#     ai_response =  await get_dalle_response(message)
+#     return ai_response
+
+
+DALLE_MONTHLY_LIMIT = 50
+
 @app.post("/chat/dalle")
-async def create_image(message:str):
-    ai_response =  await get_dalle_response(message)
-    return ai_response
+async def create_image(user_id: str, message: str, db: Session = Depends(get_db)):
+    try:
+        # 현재 달의 시작일 계산
+        today = datetime.utcnow()
+        start_of_month = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        
+        # 이번 달에 생성된 이미지 수 조회
+        image_count = db.query(func.count(models.DalleImageLog.id)).filter(
+            models.DalleImageLog.user_id == user_id,
+            models.DalleImageLog.created_at >= start_of_month
+        ).scalar()
 
+        if image_count >= DALLE_MONTHLY_LIMIT:
+            return "Reached monthly limit"
 
+        # DALL-E API 호출
+        ai_response = await get_dalle_response(message)
+        
+        # DB에 로그 저장
+        log_entry = models.DalleImageLog(user_id=user_id, message=message)
+        db.add(log_entry)
+        db.commit()
+        
+        return ai_response
+    
+    except SQLAlchemyError as e:
+        db.rollback()
+        print(f"Database error: {str(e)}")
+        return {"error": "Database error occurred"}
+    
+    except Exception as e:
+        print(f"Unexpected error: {str(e)}")
+        return {"error": "An unexpected error occurred"}
+
+# 사용자별 이미지 생성 횟수 조회 엔드포인트
+@app.get("/chat/dalle/usage/{user_id}")
+def get_dalle_usage(user_id: str, db: Session = Depends(get_db)):
+    today = datetime.utcnow()
+    start_of_month = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    
+    print("start_of_month: ", start_of_month)
+    image_count = db.query(func.count(models.DalleImageLog.id)).filter(
+        models.DalleImageLog.user_id == user_id,
+        models.DalleImageLog.created_at >= start_of_month
+    ).scalar()
+
+    return {
+        "user_id": user_id,
+        "month": today.strftime("%Y-%m"),
+        "image_count": image_count,
+        "remaining": max(0, DALLE_MONTHLY_LIMIT - image_count)
+    }
 
 # 채팅 전송
 @app.post("/chat/send")
@@ -296,27 +352,6 @@ async def update_subscription_status(store_log: schemas.StoreLogCreate, db: Sess
     # StoreLog에 새로운 레코드 추가
     new_log = models.StoreLog(**store_log.dict())
     db.add(new_log)
-    
-    # # type에 따른 구독 일자 설정
-    # if store_log.type == 1:
-    #     subscription_days = 0
-    # elif store_log.type == 2:
-    #     subscription_days = 30
-    # elif store_log.type == 3:
-    #     subscription_days = 365
-    # else:
-    #     raise HTTPException(status_code=400, detail="Invalid subscription type")
-    
-    # # 해당 사용자의 SubscriptionStatus 조회
-    # subscription_status = db.query(models.SubscriptionStatus).filter(models.SubscriptionStatus.user_id == store_log.user_id).first()
-    
-    # # 사용자의 SubscriptionStatus가 없는 경우 새로 생성
-    # if not subscription_status:
-    #     subscription_status = models.SubscriptionStatus(user_id=store_log.user_id, subscribed=True, expiry_date=datetime.utcnow() + timedelta(days=subscription_days))
-    #     db.add(subscription_status)
-    # else:
-    #     # 이미 구독 중인 경우 expiry_date 업데이트
-    #     subscription_status.expiry_date += timedelta(days=subscription_days)
     
     db.commit()
 

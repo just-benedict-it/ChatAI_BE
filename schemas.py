@@ -114,3 +114,10 @@ class ChatBotCardBase(BaseModel):
 
 class ChatBotCardCreate(ChatBotCardBase):
     pass
+
+
+class DalleImageLogBase(BaseModel):
+    user_id: str
+    message: str
+class DalleImageLogCreate(BaseModel):
+    pass

@@ -1,7 +1,8 @@
 from database import Base
 from sqlalchemy import Column, Integer, Float, String, ForeignKey, DateTime, Boolean, Index
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime,timedelta
+from sqlalchemy import func
 
 class User(Base):
     __tablename__ = "user"
@@ -83,4 +84,12 @@ class ChatBotCardLog(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     user_id = Column(String(100), index=True)
     chatbotcard = Column(String(100), index=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class DalleImageLog(Base):
+    __tablename__ = "dalle_image_logs"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    user_id = Column(String(100), index=True)
+    message = Column(String(10000))  # 메시지는 1000자로 제한
     created_at = Column(DateTime, default=datetime.utcnow)
