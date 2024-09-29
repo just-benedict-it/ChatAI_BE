@@ -14,10 +14,10 @@ async def get_dalle_response(message):
     response = None
     try:
         response = client.images.generate(
-            model="dall-e-2",
+            model="dall-e-3",
             prompt=message,
-            # size="1024x1024",
-            size="256x256",
+            size="1024x1024",
+            # size="256x256",
             quality="standard",
             n=1,
         )
