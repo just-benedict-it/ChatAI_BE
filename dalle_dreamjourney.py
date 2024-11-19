@@ -20,8 +20,6 @@ shallow depth of field, soft bokeh background,
 studio backdrop, professional retouching,
 commercial photography, award winning portrait,
 featured in Vogue, shot by Annie Leibovitz
---ar 2:3 --v 6.0 --s 750 --q 2 --style raw
-
 --no artificial looking skin, no plastic skin, no fake looking,
 no oversaturated colors, no unnatural shadows,
 no unrealistic proportions, no logo, no watermark,
@@ -45,8 +43,6 @@ studio backdrop or environmental portrait setting,
 subtle depth layering, professional retouching,
 commercial photography quality, award winning composition,
 shot by Annie Leibovitz, published in Vanity Fair
---ar 3:2 --v 6.0 --s 750 --q 2 --style raw
-
 --no overlapping faces, no missing limbs, no artificial poses,
 no unnatural spacing, no identical faces, no clone-like features,
 no artificial looking skin, no plastic skin, no fake looking,
@@ -64,8 +60,6 @@ precise linework, smooth color gradients,
 professional color composition, stunning details,
 cinematic composition, dramatic camera angle,
 by Studio Ghibli, Makoto Shinkai style
---ar 16:9 --v 6.0 --s 750 --q 2 --style raw
-
 --no pixelation, no blur, no jagged edges,
 no inconsistent lines, no rough shading,
 no anatomical errors, no unnatural proportions""",
@@ -79,8 +73,6 @@ true color reproduction, controlled depth of field,
 professional retouching, extreme details,
 8k resolution, RAW quality, perfect focus,
 published in National Geographic
---ar 3:2 --v 6.0 --s 750 --q 2 --style raw
-
 --no artificial effects, no oversaturation,
 no unrealistic lighting, no digital artifacts,
 no unnatural shadows, no lens distortion""",
@@ -93,8 +85,6 @@ professional typography, scalable design,
 modern corporate aesthetic, timeless style,
 white background, perfect balance,
 award winning logo design, featured in Behance
---ar 1:1 --v 6.0 --s 750 --q 2 --style raw
-
 --no gradients, no complex patterns,
 no photorealistic elements, no busy details,
 no text unless specified, no drop shadows""",
@@ -107,25 +97,9 @@ masterful brush strokes, subtle color variations,
 traditional watercolor paper texture,
 gallery quality artwork, exhibited in art museum,
 painted by William Turner
---ar 4:3 --v 6.0 --s 750 --q 2 --style raw
-
 --no digital effects, no sharp edges,
 no artificial colors, no photorealistic elements,
 no harsh contrast, no dark blacks""",
-
-    "oil_painting": """{prompt}, classical oil painting,
-traditional oil painting technique, impasto texture,
-visible brush strokes, rich color glazing,
-Rembrandt lighting, museum quality artwork,
-professional oil painting, canvas texture,
-masterful color composition, perfect contrast,
-classical painting style, fine art quality,
-painted by John Singer Sargent
---ar 3:2 --v 6.0 --s 750 --q 2 --style raw
-
---no digital effects, no modern elements,
-no photorealistic qualities, no artificial colors,
-no harsh lighting, no contemporary style""",
 
     "minimalist": """{prompt}, minimalist art design,
 clean geometric shapes, perfect composition,
@@ -134,25 +108,9 @@ professional graphic design, perfect balance,
 museum quality minimalism, crisp edges,
 modern art style, gallery exhibition quality,
 inspired by Mondrian and Malevich
---ar 1:1 --v 6.0 --s 750 --q 2 --style raw
-
 --no complex patterns, no gradients,
 no busy details, no realistic elements,
 no texture, no organic shapes""",
-
-    "cyberpunk": """{prompt}, cyberpunk scene,
-neon lit cityscape, ray traced reflections,
-volumetric fog, holographic displays,
-chrome surfaces, wet street reflections,
-cinematic lighting, blade runner style,
-high tech dystopia, perfect exposure,
-award winning sci-fi concept art,
-published in Artstation
---ar 16:9 --v 6.0 --s 750 --q 2 --style raw
-
---no anime style, no cartoon elements,
-no unrealistic tech, no oversaturated colors,
-no inconsistent lighting, no dated effects""",
 
     "fantasy": """{prompt}, high fantasy artwork,
 epic fantasy scene, magical atmosphere,
@@ -161,11 +119,11 @@ professional digital painting, detailed ornaments,
 epic scale, dramatic lighting, detailed environment,
 award winning fantasy art, perfect composition,
 featured in Wizards of the Coast
---ar 16:9 --v 6.0 --s 750 --q 2 --style raw
-
 --no anime style, no cartoonish elements,
 no modern objects, no contemporary clothing,
 no historical inaccuracies, no lens flares""",
+
+
 "cinematic": """{prompt}, cinematic scene,
 professional cinema still, movie quality shot,
 anamorphic lens, IMAX camera quality,
@@ -175,8 +133,6 @@ color graded, spectacular shot, epic scene,
 depth of field, professional production value,
 shot by Roger Deakins, Christopher Nolan film,
 Hollywood blockbuster quality
---ar 2.39:1 --v 6.0 --s 750 --q 2 --style raw
-
 --no artificial lighting, no staged looking,
 no amateur composition, no flat lighting,
 no overexposed areas, no digital artifacts""",
@@ -189,24 +145,10 @@ clean sharp edges, professional lighting,
 subtle shadows, high attention to detail,
 award winning 3D design, featured in Behance,
 trending on Artstation
---ar 1:1 --v 6.0 --s 750 --q 2 --style raw
-
 --no incorrect perspective, no mixed angles,
 no realistic photography, no lens effects,
 no motion blur, no depth of field""",
 
-    "retro_vintage": """{prompt}, vintage retro style,
-1980s aesthetic, nostalgic atmosphere,
-period accurate details, vintage color grading,
-authentic retro lighting, film grain texture,
-old photo quality, Kodachrome colors,
-authentic vintage mood, perfect composition,
-professional photography, museum archive quality
---ar 4:3 --v 6.0 --s 750 --q 2 --style raw
-
---no modern elements, no contemporary style,
-no digital effects, no anachronisms,
-no mixed era details, no artificial aging"""
 }
 
 class DalleImageGenerator:
