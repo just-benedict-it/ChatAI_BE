@@ -19,6 +19,7 @@ from fastapi import Body
 from typing import List
 from claude import get_claude_response
 from dalle import get_dalle_response
+from dalle_dreamjourney import get_dalle_response_dreamjourney
 from sqlalchemy.exc import SQLAlchemyError
 
 
@@ -244,6 +245,41 @@ async def create_image(user_id: str, message: str, db: Session = Depends(get_db)
         print(f"Unexpected error: {str(e)}")
         return {"error": "An unexpected error occurred"}
 
+@app.post("/chat/dalle_dreamhourney")
+async def create_image_dreamjourney(user_id: str, message: str, style:str = None, db: Session = Depends(get_db)):
+    try:
+        # 현재 달의 시작일 계산
+        today = datetime.utcnow()
+        start_of_month = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        
+        # 이번 달에 생성된 이미지 수 조회
+        image_count = db.query(func.count(models.DalleImageLog.id)).filter(
+            models.DalleImageLog.user_id == user_id,
+            models.DalleImageLog.created_at >= start_of_month
+        ).scalar()
+
+        if image_count >= DALLE_MONTHLY_LIMIT:
+            return "Reached monthly limit"
+
+        # DALL-E API 호출
+        ai_response = await get_dalle_response_dreamjourney(prompt=message , style=style)
+        
+        # DB에 로그 저장
+        log_entry = models.DalleImageLog(user_id=user_id, message=message)
+        db.add(log_entry)
+        db.commit()
+        
+        return ai_response
+    
+    except SQLAlchemyError as e:
+        db.rollback()
+        print(f"Database error: {str(e)}")
+        return {"error": "Database error occurred"}
+    
+    except Exception as e:
+        print(f"Unexpected error: {str(e)}")
+        return {"error": "An unexpected error occurred"}
+    
 # 사용자별 이미지 생성 횟수 조회 엔드포인트
 @app.get("/chat/dalle/usage/{user_id}")
 def get_dalle_usage(user_id: str, db: Session = Depends(get_db)):

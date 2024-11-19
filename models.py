@@ -15,6 +15,7 @@ class User(Base):
     subscribed = Column(Boolean, default=False, index=True)
     is_test = Column(Boolean, default=False, index=True)
     experiment = Column(Boolean, default=False, index=True)
+    app = Column(String(50))
 
 class ChatHistory(Base):
     __tablename__ = "chat_history"

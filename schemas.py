@@ -8,6 +8,7 @@ from typing import Optional
 class UserBase(BaseModel):
     os: str
     country: str
+    app: Optional[str] = None
 
 class UserCreate(UserBase):
     pass

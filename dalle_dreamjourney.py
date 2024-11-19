@@ -1,0 +1,271 @@
+from dotenv import load_dotenv
+import os
+from openai import OpenAI
+from typing import Optional, Dict
+
+load_dotenv()
+API_KEY = os.getenv("DALLE_API")
+
+STYLE_TEMPLATES = {
+    "single_portrait": """{prompt}, professional headshot portrait photograph of a person, 
+hyperrealistic, photorealistic, ultrarealistic, 
+shot on Canon EOS R5, 85mm f/1.2 lens, natural studio lighting, 
+RAW photo, 8k resolution, highly detailed skin texture,
+natural skin pores and imperfections, subsurface scattering,
+natural eye reflections, detailed iris, clean focused eyes,
+individual hair strands, natural hair texture,
+professional color grading, perfect exposure,
+subtle smile, relaxed expression, professional pose,
+shallow depth of field, soft bokeh background,
+studio backdrop, professional retouching,
+commercial photography, award winning portrait,
+featured in Vogue, shot by Annie Leibovitz
+--ar 2:3 --v 6.0 --s 750 --q 2 --style raw
+
+--no artificial looking skin, no plastic skin, no fake looking,
+no oversaturated colors, no unnatural shadows,
+no unrealistic proportions, no logo, no watermark,
+no signature, no text, no asymmetrical face""",
+
+    "group_portrait": """{prompt}, professional group photograph of people, 
+cinematic composition, perfect framing, rule of thirds,
+hyperrealistic, photorealistic, ultrarealistic, 
+shot on Sony A7R IV, 24-70mm f/2.8 GM lens,
+natural studio lighting setup with soft boxes, 
+RAW photo, 8k resolution, highly detailed,
+natural skin textures and tones for each person,
+subsurface scattering on skin, individual facial features,
+clear focused eyes with catchlights, natural eye reflections,
+detailed iris for each person, individual hair strands,
+natural hair textures and styles, perfect group positioning,
+balanced spacing between subjects, varied natural poses,
+coordinated but individual expressions, relaxed ambiance,
+professional color grading, perfect exposure,
+studio backdrop or environmental portrait setting,
+subtle depth layering, professional retouching,
+commercial photography quality, award winning composition,
+shot by Annie Leibovitz, published in Vanity Fair
+--ar 3:2 --v 6.0 --s 750 --q 2 --style raw
+
+--no overlapping faces, no missing limbs, no artificial poses,
+no unnatural spacing, no identical faces, no clone-like features,
+no artificial looking skin, no plastic skin, no fake looking,
+no oversaturated colors, no unnatural shadows,
+no unrealistic proportions, no logo, no watermark,
+no signature, no text, no asymmetrical faces""",
+
+"anime": """{prompt}, anime illustration, masterpiece quality,
+highres, professional digital art, studio anime quality,
+vibrant colors, clean sharp lines, cell shaded,
+beautiful detailed eyes, reflective pupil highlights,
+dynamic lighting, soft ambient occlusion,
+detailed hair strands with highlights,
+precise linework, smooth color gradients,
+professional color composition, stunning details,
+cinematic composition, dramatic camera angle,
+by Studio Ghibli, Makoto Shinkai style
+--ar 16:9 --v 6.0 --s 750 --q 2 --style raw
+
+--no pixelation, no blur, no jagged edges,
+no inconsistent lines, no rough shading,
+no anatomical errors, no unnatural proportions""",
+
+    "photo_realistic": """{prompt}, hyperrealistic photograph,
+ultra detailed, photorealistic rendering,
+shot on Phase One IQ4 150MP, optimal exposure,
+perfect composition, award winning photography,
+natural lighting, physically accurate materials,
+true color reproduction, controlled depth of field,
+professional retouching, extreme details,
+8k resolution, RAW quality, perfect focus,
+published in National Geographic
+--ar 3:2 --v 6.0 --s 750 --q 2 --style raw
+
+--no artificial effects, no oversaturation,
+no unrealistic lighting, no digital artifacts,
+no unnatural shadows, no lens distortion""",
+
+    "logo": """{prompt}, professional logo design,
+minimal clean vector style, perfect symmetry,
+iconic design, corporate branding quality,
+perfect geometry, golden ratio proportions,
+professional typography, scalable design,
+modern corporate aesthetic, timeless style,
+white background, perfect balance,
+award winning logo design, featured in Behance
+--ar 1:1 --v 6.0 --s 750 --q 2 --style raw
+
+--no gradients, no complex patterns,
+no photorealistic elements, no busy details,
+no text unless specified, no drop shadows""",
+
+    "watercolor": """{prompt}, traditional watercolor painting,
+professional artist quality, wet on wet technique,
+organic paint flows, natural pigment granulation,
+visible paper texture, controlled color bleeds,
+masterful brush strokes, subtle color variations,
+traditional watercolor paper texture,
+gallery quality artwork, exhibited in art museum,
+painted by William Turner
+--ar 4:3 --v 6.0 --s 750 --q 2 --style raw
+
+--no digital effects, no sharp edges,
+no artificial colors, no photorealistic elements,
+no harsh contrast, no dark blacks""",
+
+    "oil_painting": """{prompt}, classical oil painting,
+traditional oil painting technique, impasto texture,
+visible brush strokes, rich color glazing,
+Rembrandt lighting, museum quality artwork,
+professional oil painting, canvas texture,
+masterful color composition, perfect contrast,
+classical painting style, fine art quality,
+painted by John Singer Sargent
+--ar 3:2 --v 6.0 --s 750 --q 2 --style raw
+
+--no digital effects, no modern elements,
+no photorealistic qualities, no artificial colors,
+no harsh lighting, no contemporary style""",
+
+    "minimalist": """{prompt}, minimalist art design,
+clean geometric shapes, perfect composition,
+limited color palette, strategic negative space,
+professional graphic design, perfect balance,
+museum quality minimalism, crisp edges,
+modern art style, gallery exhibition quality,
+inspired by Mondrian and Malevich
+--ar 1:1 --v 6.0 --s 750 --q 2 --style raw
+
+--no complex patterns, no gradients,
+no busy details, no realistic elements,
+no texture, no organic shapes""",
+
+    "cyberpunk": """{prompt}, cyberpunk scene,
+neon lit cityscape, ray traced reflections,
+volumetric fog, holographic displays,
+chrome surfaces, wet street reflections,
+cinematic lighting, blade runner style,
+high tech dystopia, perfect exposure,
+award winning sci-fi concept art,
+published in Artstation
+--ar 16:9 --v 6.0 --s 750 --q 2 --style raw
+
+--no anime style, no cartoon elements,
+no unrealistic tech, no oversaturated colors,
+no inconsistent lighting, no dated effects""",
+
+    "fantasy": """{prompt}, high fantasy artwork,
+epic fantasy scene, magical atmosphere,
+volumetric god rays, particle effects,
+professional digital painting, detailed ornaments,
+epic scale, dramatic lighting, detailed environment,
+award winning fantasy art, perfect composition,
+featured in Wizards of the Coast
+--ar 16:9 --v 6.0 --s 750 --q 2 --style raw
+
+--no anime style, no cartoonish elements,
+no modern objects, no contemporary clothing,
+no historical inaccuracies, no lens flares""",
+"cinematic": """{prompt}, cinematic scene,
+professional cinema still, movie quality shot,
+anamorphic lens, IMAX camera quality,
+perfect cinematic lighting, film grain,
+dramatic atmosphere, perfect composition,
+color graded, spectacular shot, epic scene,
+depth of field, professional production value,
+shot by Roger Deakins, Christopher Nolan film,
+Hollywood blockbuster quality
+--ar 2.39:1 --v 6.0 --s 750 --q 2 --style raw
+
+--no artificial lighting, no staged looking,
+no amateur composition, no flat lighting,
+no overexposed areas, no digital artifacts""",
+
+    "isometric": """{prompt}, isometric design,
+perfect 45-degree angle, clean 3D rendering,
+professional architectural visualization,
+detailed miniature scene, perfect perspective,
+clean sharp edges, professional lighting,
+subtle shadows, high attention to detail,
+award winning 3D design, featured in Behance,
+trending on Artstation
+--ar 1:1 --v 6.0 --s 750 --q 2 --style raw
+
+--no incorrect perspective, no mixed angles,
+no realistic photography, no lens effects,
+no motion blur, no depth of field""",
+
+    "retro_vintage": """{prompt}, vintage retro style,
+1980s aesthetic, nostalgic atmosphere,
+period accurate details, vintage color grading,
+authentic retro lighting, film grain texture,
+old photo quality, Kodachrome colors,
+authentic vintage mood, perfect composition,
+professional photography, museum archive quality
+--ar 4:3 --v 6.0 --s 750 --q 2 --style raw
+
+--no modern elements, no contemporary style,
+no digital effects, no anachronisms,
+no mixed era details, no artificial aging"""
+}
+
+class DalleImageGenerator:
+    def __init__(self, api_key: str):
+        self.client = OpenAI(api_key=api_key)
+    
+    def _build_prompt(self, base_prompt: str, style: Optional[str] = None) -> str:
+        """스타일에 따른 프롬프트 생성"""
+        if not style or style not in STYLE_TEMPLATES:
+            return base_prompt
+        return STYLE_TEMPLATES[style].format(prompt=base_prompt)
+
+    async def generate_image(
+        self, 
+        prompt: str, 
+        style: Optional[str] = None,
+        size: str = "1024x1024",
+        quality: str = "standard"
+    ) -> Dict[str, str]:
+        """이미지 생성 함수"""
+        try:
+            final_prompt = self._build_prompt(prompt, style)
+
+            print("final_prompt: ", final_prompt)
+            
+            response = self.client.images.generate(
+                model="dall-e-3",
+                prompt=final_prompt,
+                size=size,
+                quality=quality,
+                n=1,
+            )
+            
+            return {
+                "status": "success",
+                "url": response.data[0].url,
+                "prompt": final_prompt
+            }
+            
+        except Exception as e:
+            return {
+                "status": "error",
+                "error": str(e),
+                "prompt": final_prompt if 'final_prompt' in locals() else prompt
+            }
+
+    def get_available_styles(self) -> list[str]:
+        """사용 가능한 스타일 목록 반환"""
+        return list(STYLE_TEMPLATES.keys())
+    
+async def get_dalle_response_dreamjourney(prompt: str, style: str = None):
+    generator = DalleImageGenerator(API_KEY)
+    
+    result = await generator.generate_image(
+        prompt=prompt,
+        style=style
+    )
+    
+    if result["status"] == "success":
+        return result["url"]
+    else:
+        return result["error"]
