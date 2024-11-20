@@ -19,12 +19,21 @@ from fastapi import Body
 from typing import List
 from claude import get_claude_response
 from dalle import get_dalle_response
-from dalle_dreamjourney import get_dalle_response_dreamjourney
+from dalle_dreamjourney import get_dalle_response_dreamjourney, AsyncDalleImageGenerator
 from sqlalchemy.exc import SQLAlchemyError
-
+from fastapi import FastAPI, Depends, HTTPException
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
+from datetime import datetime
+from sqlalchemy import func
+from typing import List
+import asyncio
 
 load_dotenv()
 openai.api_key = os.getenv("CHATGPT_API")
+
+API_KEY = os.getenv("DALLE_API")
+
 
 app = FastAPI(debug=True)
 
@@ -245,8 +254,17 @@ async def create_image(user_id: str, message: str, db: Session = Depends(get_db)
         print(f"Unexpected error: {str(e)}")
         return {"error": "An unexpected error occurred"}
 
+
+# 전역 변수로 생성하여 재사용
+dalle_generator = AsyncDalleImageGenerator(API_KEY)
+
 @app.post("/chat/dalle_dreamhourney")
-async def create_image_dreamjourney(user_id: str, message: str, style:str = None, db: Session = Depends(get_db)):
+async def create_image_dreamjourney(
+    user_id: str, 
+    message: str, 
+    style: str = None, 
+    db: Session = Depends(get_db)
+):
     try:
         # 현재 달의 시작일 계산
         today = datetime.utcnow()
@@ -259,26 +277,36 @@ async def create_image_dreamjourney(user_id: str, message: str, style:str = None
         ).scalar()
 
         if image_count >= DALLE_MONTHLY_LIMIT:
-            return "Reached monthly limit"
+            raise HTTPException(
+                status_code=429,
+                detail="Monthly image generation limit reached"
+            )
 
-        # DALL-E API 호출
-        ai_response = await get_dalle_response_dreamjourney(prompt=message , style=style)
+        # DALL-E API 호출 (전역 인스턴스 사용)
+        result = await dalle_generator.generate_image(
+            prompt=message,
+            style=style
+        )
         
-        # DB에 로그 저장
+        if result["status"] == "error":
+            raise HTTPException(
+                status_code=500,
+                detail=f"DALL-E API error: {result['error']}"
+            )
+
         log_entry = models.DalleImageLog(user_id=user_id, message=message)
         db.add(log_entry)
         db.commit()
         
-        return ai_response
-    
-    except SQLAlchemyError as e:
-        db.rollback()
-        print(f"Database error: {str(e)}")
-        return {"error": "Database error occurred"}
-    
+        return result["url"]
+
+    except HTTPException as e:
+        raise e
     except Exception as e:
-        print(f"Unexpected error: {str(e)}")
-        return {"error": "An unexpected error occurred"}
+        raise HTTPException(
+            status_code=500,
+            detail=f"An unexpected error occurred: {str(e)}"
+        )
     
 # 사용자별 이미지 생성 횟수 조회 엔드포인트
 @app.get("/chat/dalle/usage/{user_id}")

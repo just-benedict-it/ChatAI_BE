@@ -2,6 +2,9 @@ from dotenv import load_dotenv
 import os
 from openai import OpenAI
 from typing import Optional, Dict
+from openai import AsyncOpenAI
+from typing import Optional, Dict
+import asyncio
 
 load_dotenv()
 API_KEY = os.getenv("DALLE_API")
@@ -150,10 +153,9 @@ no realistic photography, no lens effects,
 no motion blur, no depth of field""",
 
 }
-
-class DalleImageGenerator:
+class AsyncDalleImageGenerator:
     def __init__(self, api_key: str):
-        self.client = OpenAI(api_key=api_key)
+        self.client = AsyncOpenAI(api_key=api_key)
     
     def _build_prompt(self, base_prompt: str, style: Optional[str] = None) -> str:
         """스타일에 따른 프롬프트 생성"""
@@ -171,10 +173,9 @@ class DalleImageGenerator:
         """이미지 생성 함수"""
         try:
             final_prompt = self._build_prompt(prompt, style)
-
             print("final_prompt: ", final_prompt)
             
-            response = self.client.images.generate(
+            response = await self.client.images.generate(
                 model="dall-e-3",
                 prompt=final_prompt,
                 size=size,
@@ -198,10 +199,9 @@ class DalleImageGenerator:
     def get_available_styles(self) -> list[str]:
         """사용 가능한 스타일 목록 반환"""
         return list(STYLE_TEMPLATES.keys())
-    
+
 async def get_dalle_response_dreamjourney(prompt: str, style: str = None):
-    generator = DalleImageGenerator(API_KEY)
-    
+    generator = AsyncDalleImageGenerator(API_KEY)
     result = await generator.generate_image(
         prompt=prompt,
         style=style
