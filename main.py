@@ -20,6 +20,7 @@ from typing import List
 from claude import get_claude_response
 from dalle import get_dalle_response
 from dalle_dreamjourney import get_dalle_response_dreamjourney, AsyncDalleImageGenerator
+from gpt_prompt_generator import get_midjourney_prompt
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -28,6 +29,7 @@ from datetime import datetime
 from sqlalchemy import func
 from typing import List
 import asyncio
+from typing import Dict
 
 load_dotenv()
 openai.api_key = os.getenv("CHATGPT_API")
@@ -327,6 +329,23 @@ def get_dalle_usage(user_id: str, db: Session = Depends(get_db)):
         "remaining": max(0, DALLE_MONTHLY_LIMIT - image_count)
     }
 
+@app.post("/prompt/generate")
+async def generate_prompt(prompt_data: Dict = Body(...)):
+    try:
+        optimized_prompt = await get_midjourney_prompt(prompt_data)
+        
+        return {
+            "status": "success",
+            "prompt": optimized_prompt
+        }
+        
+    except Exception as e:
+        print(f"Error generating prompt: {str(e)}")
+        return {
+            "status": "error",
+            "message": "Failed to generate prompt"
+        }
+    
 # 채팅 전송
 @app.post("/chat/send")
 async def send_chat(chat: schemas.ChatHistoryCreate, model_type:int,  subscribed:schemas.Subscribed, initialPrompt: List[schemas.InitialPrompt] = Body(default=[]),  db: Session = Depends(get_db)):
