@@ -61,17 +61,29 @@ def get_db():
 async def read_root():
     return "hello"
 
-# 유저 생성 (최초 1회)
+# # 유저 생성 (최초 1회)
+# @app.post("/user/")
+# async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+#     user_id = str(uuid.uuid4())
+#     new_profile = models.User(id=user_id, **user.dict())
+#     db.add(new_profile)
+#     db.commit()
+#     db.refresh(new_profile)
+#     return {
+#         "user_id": new_profile.id,
+#     }
+
 @app.post("/user/")
 async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    if user.country == "RUB":
+        raise HTTPException(status_code=403, detail="Access denied")
+        
     user_id = str(uuid.uuid4())
     new_profile = models.User(id=user_id, **user.dict())
     db.add(new_profile)
     db.commit()
     db.refresh(new_profile)
-    return {
-        "user_id": new_profile.id,
-    }
+    return {"user_id": new_profile.id}
 
 # 유저 접속 기록 (매일 최초 1회)
 @app.post("/create_user_activity/", response_model=schemas.UserActivityRead)
