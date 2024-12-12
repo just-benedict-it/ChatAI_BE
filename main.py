@@ -75,7 +75,7 @@ async def read_root():
 
 @app.post("/user/")
 async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    if user.country == "RUB":
+    if user.country == "RUB" or user.country == "ru_RU":
         raise HTTPException(status_code=403, detail="Access denied")
         
     user_id = str(uuid.uuid4())
