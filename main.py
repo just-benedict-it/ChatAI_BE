@@ -20,6 +20,7 @@ from typing import List
 from claude import get_claude_response
 from dalle import get_dalle_response
 from dalle_dreamjourney import get_dalle_response_dreamjourney, AsyncDalleImageGenerator
+from hive_dreamjourney import get_hive_response_dreamjourney
 from gpt_prompt_generator import get_midjourney_prompt
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import FastAPI, Depends, HTTPException
@@ -30,6 +31,7 @@ from sqlalchemy import func
 from typing import List
 import asyncio
 from typing import Dict
+
 
 load_dotenv()
 openai.api_key = os.getenv("CHATGPT_API")
@@ -233,6 +235,7 @@ def update_free_message(user_id: str, free_message: int, db: Session = Depends(g
 
 DALLE_MONTHLY_LIMIT = 50
 
+# ChatAI 이미지 생성
 @app.post("/chat/dalle")
 async def create_image(user_id: str, message: str, db: Session = Depends(get_db)):
     try:
@@ -269,8 +272,59 @@ async def create_image(user_id: str, message: str, db: Session = Depends(get_db)
         return {"error": "An unexpected error occurred"}
 
 
+# Mind Journey 이미지 생성
 # 전역 변수로 생성하여 재사용
 dalle_generator = AsyncDalleImageGenerator(API_KEY)
+
+# @app.post("/chat/dalle_dreamhourney")
+# async def create_image_dreamjourney(
+#     user_id: str, 
+#     message: str, 
+#     style: str = None, 
+#     db: Session = Depends(get_db)
+# ):
+#     try:
+#         # 현재 달의 시작일 계산
+#         today = datetime.utcnow()
+#         start_of_month = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        
+#         # 이번 달에 생성된 이미지 수 조회
+#         image_count = db.query(func.count(models.DalleImageLog.id)).filter(
+#             models.DalleImageLog.user_id == user_id,
+#             models.DalleImageLog.created_at >= start_of_month
+#         ).scalar()
+
+#         if image_count >= DALLE_MONTHLY_LIMIT:
+#             raise HTTPException(
+#                 status_code=429,
+#                 detail="Monthly image generation limit reached"
+#             )
+
+#         # DALL-E API 호출 (전역 인스턴스 사용)
+#         result = await dalle_generator.generate_image(
+#             prompt=message,
+#             style=style
+#         )
+        
+#         if result["status"] == "error":
+#             raise HTTPException(
+#                 status_code=500,
+#                 detail=f"DALL-E API error: {result['error']}"
+#             )
+
+#         log_entry = models.DalleImageLog(user_id=user_id, message=message)
+#         db.add(log_entry)
+#         db.commit()
+        
+#         return result["url"]
+
+#     except HTTPException as e:
+#         raise e
+#     except Exception as e:
+#         raise HTTPException(
+#             status_code=500,
+#             detail=f"An unexpected error occurred: {str(e)}"
+#         )
 
 @app.post("/chat/dalle_dreamhourney")
 async def create_image_dreamjourney(
@@ -297,7 +351,7 @@ async def create_image_dreamjourney(
             )
 
         # DALL-E API 호출 (전역 인스턴스 사용)
-        result = await dalle_generator.generate_image(
+        result = await get_hive_response_dreamjourney(
             prompt=message,
             style=style
         )
@@ -305,7 +359,7 @@ async def create_image_dreamjourney(
         if result["status"] == "error":
             raise HTTPException(
                 status_code=500,
-                detail=f"DALL-E API error: {result['error']}"
+                detail=f"HIVE API error: {result['error']}"
             )
 
         log_entry = models.DalleImageLog(user_id=user_id, message=message)
