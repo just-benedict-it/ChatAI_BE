@@ -139,7 +139,7 @@ no motion blur, no depth of field""",
 class AsyncHiveImageGenerator:
     def __init__(self, api_key: str):
         self.api_key = api_key
-        self.endpoint = "https://api.thehive.ai/api/v3/hive/flux-schnell"
+        self.endpoint = "https://api.thehive.ai/api/v3/hive/flux-schnell-enhanced"
         
     def _build_prompt(self, base_prompt: str, style: Optional[str] = None) -> str:
         """스타일에 따른 프롬프트 생성"""
