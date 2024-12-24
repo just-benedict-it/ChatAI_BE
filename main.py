@@ -438,7 +438,7 @@ async def generate_prompt(prompt_data: Dict = Body(...), db: Session = Depends(g
         activity = schemas.UserActivityCreate(
             activity_type=10,
             user_id="Midjourney",
-            message=prompt_data.get("prompt", "")
+            message=prompt_data
         )
         
         # DB에 저장
