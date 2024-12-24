@@ -161,8 +161,6 @@ class AsyncHiveImageGenerator:
             # Parse size string (e.g., "1024x1024") into width and height
             width, height = map(int, size.split('x'))
 
-            # Generate random seed between 0 and 2147483647
-            random_seed = random.randint(0, 2147483647)
             
             headers = {
                 'authorization': f'Bearer {self.api_key}',
@@ -178,7 +176,7 @@ class AsyncHiveImageGenerator:
                     },
                     'num_inference_steps': 2,
                     'num_images': 1,
-                    'seed': random_seed,
+                    'seed': -1,
                     'output_format': 'png',
                 }
             }

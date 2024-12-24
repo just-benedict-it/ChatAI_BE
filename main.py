@@ -234,6 +234,8 @@ def update_free_message(user_id: str, free_message: int, db: Session = Depends(g
 
 
 DALLE_MONTHLY_LIMIT = 50
+MJ_MONTHLY_LIMIT = 300
+
 
 # ChatAI 이미지 생성
 @app.post("/chat/dalle")
@@ -252,15 +254,30 @@ async def create_image(user_id: str, message: str, db: Session = Depends(get_db)
         if image_count >= DALLE_MONTHLY_LIMIT:
             return "Reached monthly limit"
 
-        # DALL-E API 호출
-        ai_response = await get_dalle_response(message)
+        # DALL-E API 호출 (전역 인스턴스 사용)
+        result = await get_hive_response_dreamjourney(prompt=message)
         
-        # DB에 로그 저장
+        if result["status"] == "error":
+            raise HTTPException(
+                status_code=500,
+                detail=f"HIVE API error: {result['error']}"
+            )
+
         log_entry = models.DalleImageLog(user_id=user_id, message=message)
         db.add(log_entry)
         db.commit()
+
+        return result["url"]
+
+        # # DALL-E API 호출
+        # ai_response = await get_dalle_response(message)
         
-        return ai_response
+        # # DB에 로그 저장
+        # log_entry = models.DalleImageLog(user_id=user_id, message=message)
+        # db.add(log_entry)
+        # db.commit()
+        
+        # return ai_response
     
     except SQLAlchemyError as e:
         db.rollback()
@@ -344,7 +361,7 @@ async def create_image_dreamjourney(
             models.DalleImageLog.created_at >= start_of_month
         ).scalar()
 
-        if image_count >= DALLE_MONTHLY_LIMIT:
+        if image_count >= MJ_MONTHLY_LIMIT:
             raise HTTPException(
                 status_code=429,
                 detail="Monthly image generation limit reached"
