@@ -412,10 +412,40 @@ def get_dalle_usage(user_id: str, db: Session = Depends(get_db)):
         "remaining": max(0, DALLE_MONTHLY_LIMIT - image_count)
     }
 
+# @app.post("/prompt/generate")
+# async def generate_prompt(prompt_data: Dict = Body(...)):
+#     try:
+#         optimized_prompt = await get_midjourney_prompt(prompt_data)
+        
+#         return {
+#             "status": "success",
+#             "prompt": optimized_prompt
+#         }
+        
+#     except Exception as e:
+#         print(f"Error generating prompt: {str(e)}")
+#         return {
+#             "status": "error",
+#             "message": "Failed to generate prompt"
+#         }
+
 @app.post("/prompt/generate")
-async def generate_prompt(prompt_data: Dict = Body(...)):
+async def generate_prompt(prompt_data: Dict = Body(...), db: Session = Depends(get_db)):
     try:
         optimized_prompt = await get_midjourney_prompt(prompt_data)
+        
+        # UserActivity 생성
+        activity = schemas.UserActivityCreate(
+            activity_type=10,
+            user_id="Midjourney",
+            message=prompt_data.get("prompt", "")
+        )
+        
+        # DB에 저장
+        new_activity = models.UserActivity(**activity.dict())
+        db.add(new_activity)
+        db.commit()
+        db.refresh(new_activity)
         
         return {
             "status": "success",
@@ -428,7 +458,7 @@ async def generate_prompt(prompt_data: Dict = Body(...)):
             "status": "error",
             "message": "Failed to generate prompt"
         }
-    
+        
 # 채팅 전송
 @app.post("/chat/send")
 async def send_chat(chat: schemas.ChatHistoryCreate, model_type:int,  subscribed:schemas.Subscribed, initialPrompt: List[schemas.InitialPrompt] = Body(default=[]),  db: Session = Depends(get_db)):
