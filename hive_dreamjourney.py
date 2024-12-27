@@ -144,8 +144,17 @@ class AsyncHiveImageGenerator:
     def _build_prompt(self, base_prompt: str, style: Optional[str] = None) -> str:
         """스타일에 따른 프롬프트 생성"""
         if not style or style not in STYLE_TEMPLATES:
-            return base_prompt
-        return STYLE_TEMPLATES[style].format(prompt=base_prompt)
+            final_prompt = base_prompt
+        else:
+            final_prompt = STYLE_TEMPLATES[style].format(prompt=base_prompt)
+        
+        # 900자로 제한
+        return final_prompt[:900] if len(final_prompt) > 900 else final_prompt
+    # def _build_prompt(self, base_prompt: str, style: Optional[str] = None) -> str:
+    #     """스타일에 따른 프롬프트 생성"""
+    #     if not style or style not in STYLE_TEMPLATES:
+    #         return base_prompt
+    #     return STYLE_TEMPLATES[style].format(prompt=base_prompt)
 
     async def generate_image(
         self, 
